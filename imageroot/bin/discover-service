@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2023 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# Find settings (port, ip, ..) of mail service among the cluster
+#
+
+import os
+import sys
+import json
+import agent
+
+# This script must rely on local node resources to ensure service startup
+# even if the leader node is not reachable: connect to local Redis
+# replica.
+rdb = agent.redis_connect(use_replica=True)
+
+imap = agent.list_service_providers(rdb, 'imap', 'tcp', {
+    'module_uuid': os.environ['MAIL_SERVER']
+})
+
+if len(imap) != 1:
+    # Only ONE provider for the same UUID is allowed. Zero means it is
+    # missing. More than one means the DB is inconsistent.
+    print(agent.SD_ERR + "Cannot find the imap service of my Mail module instance", os.environ['MAIL_SERVER'], file=sys.stderr)
+    sys.exit(4)
+
+smtp = agent.list_service_providers(rdb, 'submission', 'tcp', {
+    'module_uuid': os.getenv('MAIL_SERVER', '')
+})
+
+if len(smtp) != 1:
+    # Only ONE provider for the same UUID is allowed. Zero means it is
+    # missing. More than one means the DB is inconsistent.
+    print(agent.SD_ERR + "Cannot find the submission service of my Mail module instance", os.environ['MAIL_SERVER'], file=sys.stderr)
+    sys.exit(5)
+
+imap_port = imap[0]['port']
+imap_server = imap[0]['host']
+user_domain = os.getenv('MAIL_DOMAIN', imap[0]['user_domain'])
+
+smtp_port = smtp[0]['port']
+smtp_server = smtp[0]['host']
+
+envfile = "discovery.env"
+
+# Using .tmp suffix: do not overwrite the target file until the new one is
+# saved to disk:
+with open(envfile + ".tmp", "w") as efp:
+    print(f"SOGO_DEFAULT_PORT={imap_port}", file=efp)
+    print(f"SOGO_SMTP_PORT={smtp_port}", file=efp)
+    print(f"SOGO_DEFAULT_HOST={imap_server}", file=efp)
+    print(f"SOGO_SMTP_SERVER={smtp_server}", file=efp)
+
+# Commit changes by replacing the existing envfile:
+os.replace(envfile + ".tmp", envfile)
+
+# # we need to expand the IP of mail server in sieve file
+# with open("config/config.managesieve.php", "w") as f:
+#     f.write("<?php\n")
+#     f.write("$config['managesieve_host'] = '"+imap_server+":4190';\n")
+
+# #
+# # Write default settings of roundcubemail
+# #
+# with open("config/config.nethserver.php", "w") as f:
+#     f.write("<?php \n")
+#     # we want to prefill with user_domain of list_service_providers
+#     if imap_server and user_domain:
+#         f.write("$config['username_domain'] = array('"+imap_server+"' => '"+ user_domain +"'); \n")
+#         f.write("$config['username_domain_forced'] = true; \n")
+#         f.write("$config['mail_domain'] = array('"+imap_server+"' => '"+ user_domain +"'); \n")
+#     # allow the browser to save login/credential and to fill them
+#     f.write("$config['login_autocomplete'] = 2; \n")
