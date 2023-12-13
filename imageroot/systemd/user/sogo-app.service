@@ -11,26 +11,28 @@ After=sogo.service mariadb-app.service
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 EnvironmentFile=%S/state/environment
-EnvironmentFile=-%S/state/discovery.env
+EnvironmentFile=-%S/state/discovery_mail.env
+EnvironmentFile=-%S/state/discovery_ldap.env
 WorkingDirectory=%S/state
 Restart=always
 TimeoutStopSec=70
-ExecStartPre=/bin/mkdir -p config
+ExecStartPre=/usr/bin/bash -c "/bin/mkdir -p {config,backups}"
 ExecStartPre=/bin/rm -f %t/sogo-app.pid %t/sogo-app.ctr-id
-ExecStartPre=runagent discover-ldap
+ExecStartPre=/usr/local/bin/runagent discover-ldap
 ExecStartPre=/usr/local/bin/runagent discover-service
+ExecStartPre=/usr/local/bin/runagent expand-configuration
+ExecStartPre=/usr/local/bin/runagent reveal-master-secret
+ExecStartPost=/usr/bin/bash -c "while ! /usr/bin/podman exec sogo-app /usr/bin/curl  http://127.0.0.1:20001/SOGo ; do sleep 3 ; done"
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/sogo-app.pid \
     --cidfile %t/sogo-app.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/sogo.pod-id --replace -d --name  sogo-app \
-    --volume ./config:/etc/sogo:Z \
-    --env=sogo_* \
-    --env sogo_DB_TYPE=mysql \
-    --env sogo_DB_HOST=127.0.0.1 \
-    --env sogo_DB_PORT=3306 \
-    --env sogo_DB_USER=sogo \
-    --env sogo_DB_PASSWORD=Nethesis,1234 \
-    --env sogo_DB_NAME=sogo \
-    ${sogo_IMAGE}
+    --volume ./config/sogo.conf:/etc/sogo/sogo.conf:Z \
+    --volume ./config/cron-sogo:/etc/cron.d/cron-sogo:Z \
+    --volume ./config/sieve.creds:/etc/sogo/sieve.creds:Z \
+    --volume ./config/SOGo.conf:/etc/httpd/conf/extra/SOGo.conf:Z \
+    --volume ./backups:/etc/sogo/backups:Z \
+    --env=SOGO_* \
+    ${SOGO_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/sogo-app.ctr-id -t 10
 ExecReload=/usr/bin/podman kill -s HUP sogo-app
 SyslogIdentifier=%u
