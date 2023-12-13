@@ -20,7 +20,6 @@ config = {}
 
 # Read current configuration from the environment file
 config["host"] = os.getenv("TRAEFIK_HOST","")
-config["http2https"] = os.getenv("TRAEFIK_HTTP2HTTPS") == "True"
 config["lets_encrypt"] = os.getenv("TRAEFIK_LETS_ENCRYPT") == "True"
 config["mail_server"] = os.getenv("MAIL_SERVER", "") # the value is the Mail module UUID!
 config["mail_domain"] = os.getenv("MAIL_DOMAIN", "") # the value is the mail domain of user to force domain identity : user@domain.com !

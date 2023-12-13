@@ -47,20 +47,6 @@
                 $t("settings.enabled")
               }}</template>
             </cv-toggle>
-            <cv-toggle
-              value="httpToHttps"
-              :label="$t('settings.http_to_https')"
-              v-model="isHttpToHttpsEnabled"
-              :disabled="loading.getConfiguration || loading.configureModule"
-              class="mg-bottom"
-            >
-              <template slot="text-left">{{
-                $t("settings.disabled")
-              }}</template>
-              <template slot="text-right">{{
-                $t("settings.enabled")
-              }}</template>
-            </cv-toggle>
             <NsComboBox
               v-model.trim="mail_server"
               :autoFilter="true"
@@ -78,9 +64,7 @@
               ref="mail_server"
             >
               <template slot="tooltip">
-              {{
-                $t("settings.choose_the_mail_server_to_use")
-              }}
+                {{ $t("settings.choose_the_mail_server_to_use") }}
               </template>
             </NsComboBox>
             <NsComboBox
@@ -100,9 +84,9 @@
               ref="ldap_domain"
             >
               <template slot="tooltip">
-              {{
-                $t("settings.choose_the_ldap_domain_to_authenticate_users")
-              }}
+                {{
+                  $t("settings.choose_the_ldap_domain_to_authenticate_users")
+                }}
               </template>
             </NsComboBox>
             <!-- advanced options -->
@@ -192,8 +176,7 @@ export default {
       urlCheckInterval: null,
       host: "",
       isLetsEncryptEnabled: false,
-      isHttpToHttpsEnabled: true,
-      ldap_domain : "",
+      ldap_domain: "",
       mail_server: "",
       mail_domain: "",
       mail_server_URL: [],
@@ -209,7 +192,7 @@ export default {
         lets_encrypt: "",
         http2https: "",
         mail_server: "",
-        ldap_domain: ""
+        ldap_domain: "",
       },
     };
   },
@@ -276,13 +259,12 @@ export default {
       const config = taskResult.output;
       this.host = config.host;
       this.isLetsEncryptEnabled = config.lets_encrypt;
-      this.isHttpToHttpsEnabled = config.http2https;
       // force to reload mail_server value after dom update
       this.$nextTick(() => {
         const mail_server_tmp = config.mail_server;
         const mail_domain_tmp = config.mail_domain;
         if (mail_server_tmp && mail_domain_tmp) {
-          this.mail_server = mail_server_tmp + ',' + mail_domain_tmp;
+          this.mail_server = mail_server_tmp + "," + mail_domain_tmp;
         } else {
           this.mail_server = "";
         }
@@ -368,7 +350,7 @@ export default {
         `${taskAction}-completed-${eventId}`,
         this.configureModuleCompleted
       );
-      const tmparray = this.mail_server.split(',');
+      const tmparray = this.mail_server.split(",");
       const mail_server_tmp = tmparray[0];
       const mail_domain_tmp = tmparray[1];
       const res = await to(
@@ -377,7 +359,6 @@ export default {
           data: {
             host: this.host,
             lets_encrypt: this.isLetsEncryptEnabled,
-            http2https: this.isHttpToHttpsEnabled,
             mail_server: mail_server_tmp,
             mail_domain: mail_domain_tmp,
             ldap_domain: this.ldap_domain,
