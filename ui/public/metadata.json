@@ -3,17 +3,17 @@
   "description": {
     "en": "My sogo module"
   },
-  "categories": [],
+  "categories": ["collaboration"],
   "authors": [
     {
-      "name": "Name Surname",
-      "email": "author@yourmail.org"
+      "name": "stephane de Labrusse",
+      "email": "stephdl@de-labrusse.fr"
     }
   ],
   "docs": {
-    "documentation_url": "https://docs.sogo.com/",
+    "documentation_url": "https://www.sogo.nu/files/docs/SOGoInstallationGuide.html",
     "bug_url": "https://github.com/NethServer/dev",
-    "code_url": "https://github.com/author/ns8-sogo"
+    "code_url": "https://github.com/NethServer/ns8-sogo"
   },
   "source": "ghcr.io/nethserver/sogo"
 }
