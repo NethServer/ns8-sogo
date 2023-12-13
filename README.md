@@ -50,7 +50,27 @@ Launch `configure-module`, by setting the following parameters:
 
 Example:
 
-    api-cli run module/sogo1/configure-module --data '{}'
+api-cli run configure-module --agent module/sogo1 --data - <<EOF
+{
+"mail_server": "f38f9911-8341-452e-8941-d889385a59a8",
+"ldap_domain": "ad.rocky9-pve4.org",
+"admin_users" : "Administrator",
+"mail_domain": "rocky9-pve4.org",
+  "http2https": true,
+  "lets_encrypt": false,
+  "host": "sogo3.rocky9-pve4.org",
+  "workers_count": 3,
+  "auxiliary_account": true,
+  "active_sync": true,
+  "dav": true
+}
+EOF
+
+# Setup configuration from user input.
+agent.set_env("MAIL_SERVER", data["mail_server"])
+agent.set_env("ADMIN_USERS", data.get("admin_users","administrator"))
+agent.set_env("LDAP_DOMAIN", data["ldap_domain"])
+agent.set_env("MAIL_DOMAIN",data.get("mail_domain",""))
 
 The above command will:
 - start and configure the sogo instance
