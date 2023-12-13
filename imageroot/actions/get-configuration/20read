@@ -1,14 +1,66 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2022 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-import json
-import sys
-import agent
+#
+# Read configuration
+#
 
+import os
+import sys
+import json
+import agent
+from agent.ldapproxy import Ldapproxy
+
+# Prepare return variable
 config = {}
 
+# Read current configuration from the environment file
+config["host"] = os.getenv("TRAEFIK_HOST","")
+config["http2https"] = os.getenv("TRAEFIK_HTTP2HTTPS") == "True"
+config["lets_encrypt"] = os.getenv("TRAEFIK_LETS_ENCRYPT") == "True"
+config["mail_server"] = os.getenv("MAIL_SERVER", "") # the value is the Mail module UUID!
+config["mail_domain"] = os.getenv("MAIL_DOMAIN", "") # the value is the mail domain of user to force domain identity : user@domain.com !
+config["admin_users"] = os.getenv("ADMIN_USERS", "")
+config["ldap_domain"] = os.getenv("LDAP_DOMAIN", "")
+config["workers_count"] = os.getenv("WOWORKERSCOUNT", "")
+config["auxiliary_account"] = os.getenv("AUXILIARYACCOUNT") == "True"
+
+rdb = agent.redis_connect() # full read-only access on every key
+
+modules=[]
+tmp = []
+# we query about all mail server to use it inside the user interface
+for key in agent.list_service_providers(rdb,'imap','tcp'):
+    mail = key['module_id']
+    get_retval = agent.tasks.run(f"module/{mail}",'list-domains')
+    for kd in get_retval['output']:
+        if kd['addusers']:
+            obj = {
+                "name": key['module_id'],
+                "label": f"{kd['domain']} ({key['mail_hostname']})",
+                "value": key['module_uuid']+','+kd['domain'],
+            }
+            modules.append(obj)
+
+# use it inside a dropdown
+config['mail_server_URL'] = modules
+
+# retrieve LDAP domains list
+lp = Ldapproxy()
+domains = []
+for key in lp.get_domains_list():
+    domains.append({
+        "name": key,
+        "label": key,
+        "value": key,
+    })
+
+config['user_domains_list'] = domains
+
+
+# Dump the configuration to stdout
 json.dump(config, fp=sys.stdout)
