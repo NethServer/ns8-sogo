@@ -22,79 +22,88 @@
     <cv-row>
       <cv-column>
         <cv-tile light>
-          <cv-form @submit.prevent="configureModule">
-            <cv-text-input
-              :label="$t('settings.roundcubemail_fqdn')"
-              placeholder="roundcubemail.example.org"
-              v-model.trim="host"
-              class="mg-bottom"
-              :invalid-message="$t(error.host)"
-              :disabled="loading.getConfiguration || loading.configureModule"
-              ref="host"
-            >
-            </cv-text-input>
-            <cv-toggle
-              value="letsEncrypt"
-              :label="$t('settings.lets_encrypt')"
-              v-model="isLetsEncryptEnabled"
-              :disabled="loading.getConfiguration || loading.configureModule"
-              class="mg-bottom"
-            >
-              <template slot="text-left">{{
-                $t("settings.disabled")
-              }}</template>
-              <template slot="text-right">{{
-                $t("settings.enabled")
-              }}</template>
-            </cv-toggle>
-            <NsComboBox
-              v-model.trim="mail_server"
-              :autoFilter="true"
-              :autoHighlight="true"
-              :title="$t('settings.mail_server_fqdn')"
-              :label="$t('settings.choose_mail_server')"
-              :options="mail_server_URL"
-              :userInputLabel="core.$t('settings.choose_mail_server')"
-              :acceptUserInput="false"
-              :showItemType="true"
-              :invalid-message="$t(error.mail_server)"
-              :disabled="loading.getConfiguration || loading.configureModule"
-              tooltipAlignment="start"
-              tooltipDirection="top"
-              ref="mail_server"
-            >
-              <template slot="tooltip">
-                {{ $t("settings.choose_the_mail_server_to_use") }}
-              </template>
-            </NsComboBox>
-            <NsComboBox
-              v-model.trim="ldap_domain"
-              :autoFilter="true"
-              :autoHighlight="true"
-              :title="$t('settings.ldap_domain')"
-              :label="$t('settings.choose_ldap_domain')"
-              :options="user_domains_list"
-              :userInputLabel="core.$t('settings.choose_ldap_domain')"
-              :acceptUserInput="false"
-              :showItemType="true"
-              :invalid-message="$t(error.ldap_domain)"
-              :disabled="loading.getConfiguration || loading.configureModule"
-              tooltipAlignment="start"
-              tooltipDirection="top"
-              ref="ldap_domain"
-            >
-              <template slot="tooltip">
-                {{
-                  $t("settings.choose_the_ldap_domain_to_authenticate_users")
-                }}
-              </template>
-            </NsComboBox>
-            <!-- advanced options -->
-            <cv-accordion ref="accordion" class="maxwidth mg-bottom">
-              <cv-accordion-item :open="toggleAccordion[0]">
-                <template slot="title">{{ $t("settings.advanced") }}</template>
-                <template slot="content">
-                  <!-- <cv-text-input
+            <cv-skeleton-text
+            v-show="loading.getConfiguration"
+              heading
+              paragraph
+              :line-count="15"
+              width="80%"
+            ></cv-skeleton-text>
+            <cv-form  v-show="!loading.getConfiguration" @submit.prevent="configureModule">
+              <cv-text-input
+                :label="$t('settings.roundcubemail_fqdn')"
+                placeholder="roundcubemail.example.org"
+                v-model.trim="host"
+                class="mg-bottom"
+                :invalid-message="$t(error.host)"
+                :disabled="loading.getConfiguration || loading.configureModule"
+                ref="host"
+              >
+              </cv-text-input>
+              <cv-toggle
+                value="letsEncrypt"
+                :label="$t('settings.lets_encrypt')"
+                v-model="isLetsEncryptEnabled"
+                :disabled="loading.getConfiguration || loading.configureModule"
+                class="mg-bottom"
+              >
+                <template slot="text-left">{{
+                  $t("settings.disabled")
+                }}</template>
+                <template slot="text-right">{{
+                  $t("settings.enabled")
+                }}</template>
+              </cv-toggle>
+              <NsComboBox
+                v-model.trim="mail_server"
+                :autoFilter="true"
+                :autoHighlight="true"
+                :title="$t('settings.mail_server_fqdn')"
+                :label="$t('settings.choose_mail_server')"
+                :options="mail_server_URL"
+                :userInputLabel="core.$t('settings.choose_mail_server')"
+                :acceptUserInput="false"
+                :showItemType="true"
+                :invalid-message="$t(error.mail_server)"
+                :disabled="loading.getConfiguration || loading.configureModule"
+                tooltipAlignment="start"
+                tooltipDirection="top"
+                ref="mail_server"
+              >
+                <template slot="tooltip">
+                  {{ $t("settings.choose_the_mail_server_to_use") }}
+                </template>
+              </NsComboBox>
+              <NsComboBox
+                v-model.trim="ldap_domain"
+                :autoFilter="true"
+                :autoHighlight="true"
+                :title="$t('settings.ldap_domain')"
+                :label="$t('settings.choose_ldap_domain')"
+                :options="user_domains_list"
+                :userInputLabel="core.$t('settings.choose_ldap_domain')"
+                :acceptUserInput="false"
+                :showItemType="true"
+                :invalid-message="$t(error.ldap_domain)"
+                :disabled="loading.getConfiguration || loading.configureModule"
+                tooltipAlignment="start"
+                tooltipDirection="top"
+                ref="ldap_domain"
+              >
+                <template slot="tooltip">
+                  {{
+                    $t("settings.choose_the_ldap_domain_to_authenticate_users")
+                  }}
+                </template>
+              </NsComboBox>
+              <!-- advanced options -->
+              <cv-accordion ref="accordion" class="maxwidth mg-bottom">
+                <cv-accordion-item :open="toggleAccordion[0]">
+                  <template slot="title">{{
+                    $t("settings.advanced")
+                  }}</template>
+                  <template slot="content">
+                    <!-- <cv-text-input
                     :label="$t('settings.plugins')"
                     :placeholder="$t('settings.placeholder_plugins')"
                     v-model.trim="plugins"
@@ -118,27 +127,27 @@
                     ref="upload_max_filesize"
                   >
                   </cv-text-input> -->
-                </template>
-              </cv-accordion-item>
-            </cv-accordion>
-            <cv-row v-if="error.configureModule">
-              <cv-column>
-                <NsInlineNotification
-                  kind="error"
-                  :title="$t('action.configure-module')"
-                  :description="error.configureModule"
-                  :showCloseButton="false"
-                />
-              </cv-column>
-            </cv-row>
-            <NsButton
-              kind="primary"
-              :icon="Save20"
-              :loading="loading.configureModule"
-              :disabled="loading.getConfiguration || loading.configureModule"
-              >{{ $t("settings.save") }}</NsButton
-            >
-          </cv-form>
+                  </template>
+                </cv-accordion-item>
+              </cv-accordion>
+              <cv-row v-if="error.configureModule">
+                <cv-column>
+                  <NsInlineNotification
+                    kind="error"
+                    :title="$t('action.configure-module')"
+                    :description="error.configureModule"
+                    :showCloseButton="false"
+                  />
+                </cv-column>
+              </cv-row>
+              <NsButton
+                kind="primary"
+                :icon="Save20"
+                :loading="loading.configureModule"
+                :disabled="loading.getConfiguration || loading.configureModule"
+                >{{ $t("settings.save") }}</NsButton
+              >
+            </cv-form>
         </cv-tile>
       </cv-column>
     </cv-row>
