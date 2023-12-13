@@ -9,4 +9,5 @@
 
 touch smarthost.env
 
-systemctl --user enable --now sogo.service
+systemctl --user enable sogo.service
+systemctl --user restart sogo.service
