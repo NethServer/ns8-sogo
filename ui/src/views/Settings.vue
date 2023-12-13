@@ -31,8 +31,8 @@
             ></cv-skeleton-text>
             <cv-form  v-show="!loading.getConfiguration" @submit.prevent="configureModule">
               <cv-text-input
-                :label="$t('settings.roundcubemail_fqdn')"
-                placeholder="roundcubemail.example.org"
+                :label="$t('settings.SOGo_fqdn')"
+                placeholder="SOGo.example.org"
                 v-model.trim="host"
                 class="mg-bottom"
                 :invalid-message="$t(error.host)"
@@ -306,7 +306,7 @@ export default {
         isValidationOk = false;
       }
       if (!this.ldap_domain) {
-        this.error.mail_server = "common.required";
+        this.error.ldap_domain = "common.required";
 
         if (isValidationOk) {
           this.focusElement("ldap_domain");
