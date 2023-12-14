@@ -1,32 +1,6 @@
 # ns8-sogo
 
-This is a template module for [NethServer 8](https://github.com/NethServer/ns8-core).
-To start a new module from it:
-
-1. Click on [Use this template](https://github.com/NethServer/ns8-sogo/generate).
-   Name your repo with `ns8-` prefix (e.g. `ns8-mymodule`). 
-   Do not end your module name with a number, like ~~`ns8-baaad2`~~!
-
-1. Clone the repository, enter the cloned directory and
-   [configure your GIT identity](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup#_your_identity)
-
-1. Rename some references inside the repo:
-   ```
-   modulename=$(basename $(pwd) | sed 's/^ns8-//')
-   git mv imageroot/systemd/user/sogo.service imageroot/systemd/user/${modulename}.service
-   git mv tests/sogo.robot tests/${modulename}.robot
-   sed -i "s/sogo/${modulename}/g" $(find .github/ * -type f)
-   git commit -a -m "Repository initialization"
-   ```
-
-1. Edit this `README.md` file, by replacing this section with your module
-   description
-
-1. Adjust `.github/workflows` to your needs. `clean-registry.yml` might
-   need the proper list of image names to work correctly. Unused workflows
-   can be disabled from the GitHub Actions interface.
-
-1. Commit and push your local changes
+This module intends to istall the SOGo groupware : https://www.sogo.nu/
 
 ## Install
 
@@ -43,62 +17,76 @@ Output example:
 
 Let's assume that the sogo instance is named `sogo1`.
 
+
 Launch `configure-module`, by setting the following parameters:
-- `<MODULE_PARAM1_NAME>`: <MODULE_PARAM1_DESCRIPTION>
-- `<MODULE_PARAM2_NAME>`: <MODULE_PARAM2_DESCRIPTION>
-- ...
+- `host`: a fully qualified domain name for the application
+- `lets_encrypt`: enable or disable Let's Encrypt certificate (true/false)
+- `mail_server`: the module UUID of the the mail server (only on NS8), for example `24c52316-5af5-4b4d-8b0f-734f9ee9c1d9`
+- `mail_domain`: the mail domain used for user IMAP login and SOGo user identifier. It must correspond to a valid mail domain handled by `mail_server` where user names are valid mail addresses too
+- `ldap_domain`:  a Ldap domain where to authenticate the users, it could be different than hostname. The ldap_domain is used to find an existing LDAP through LDAP proxy
+- `admin_users`: the administrator of SOGo, a comma separated list (user1,user2)
+- `workers_count`: The number of workers for SOGo; you need to adapt it to the numbers of users
+- `auxiliary_account`: Allow users to set other email accounts inside the SOGo webmail (boolean)
+- `activesync`: Enable the activesync protocom (boolean)
+- `dav`: Enable the DAV protocol (caldav,cardav) (boolean)
 
 Example:
 
-api-cli run configure-module --agent module/sogo1 --data - <<EOF
-{
-"mail_server": "f38f9911-8341-452e-8941-d889385a59a8",
-"ldap_domain": "ad.rocky9-pve4.org",
-"admin_users" : "Administrator",
-"mail_domain": "rocky9-pve4.org",
-  "http2https": true,
-  "lets_encrypt": false,
-  "host": "sogo3.rocky9-pve4.org",
-  "workers_count": 3,
-  "auxiliary_account": true,
-  "active_sync": true,
-  "dav": true
-}
-EOF
-
-# Setup configuration from user input.
-agent.set_env("MAIL_SERVER", data["mail_server"])
-agent.set_env("ADMIN_USERS", data.get("admin_users","administrator"))
-agent.set_env("LDAP_DOMAIN", data["ldap_domain"])
-agent.set_env("MAIL_DOMAIN",data.get("mail_domain",""))
+    api-cli run configure-module --agent module/sogo1 --data - <<EOF
+    {
+    "mail_server": "f38f9911-8341-452e-8941-d889385a59a8",
+    "ldap_domain": "ad.rocky9-pve4.org",
+    "admin_users" : "Administrator",
+    "mail_domain": "rocky9-pve4.org",
+    "lets_encrypt": false,
+    "host": "sogo3.rocky9-pve4.org",
+    "workers_count": "3",
+    "auxiliary_account": true,
+    "activesync": true,
+    "dav": true
+    }
+    EOF
 
 The above command will:
-- start and configure the sogo instance
-- (describe configuration process)
-- ...
+- start and configure the SOGo instance
+- configure a virtual host for trafik to access the instance
 
-Send a test HTTP request to the sogo backend service:
+## Manual configuration
 
-    curl http://127.0.0.1/sogo/
+Some settings are not available in the UI, you need to change them manually, refer to documentation : https://www.sogo.nu/files/docs/SOGoInstallationGuide.html
 
-## Smarthost setting discovery
+```
+ssh sogo1@::1
+vim .config/state/environment
+```
+modify the settings, then restart sogo : `systemctl restart --user sogo`
 
-Some configuration settings, like the smarthost setup, are not part of the
-`configure-module` action input: they are discovered by looking at some
-Redis keys.  To ensure the module is always up-to-date with the
-centralized [smarthost
-setup](https://nethserver.github.io/ns8-core/core/smarthost/) every time
-sogo starts, the command `bin/discover-smarthost` runs and refreshes
-the `state/smarthost.env` file with fresh values from Redis.
+```
+BACKUPTIME=#30 0
+DRAFTSFOLDER=Drafts
+SENTFOLDER=Sent
+SESSIONDURATION=1440
+SOGOACLSSENDEMAILNOTIFICATIONS=NO
+SOGOAPPOINTMENTSENDEMAILNOTIFICATIONS=YES
+SOGOENABLEEMAILALARMS=YES
+SOGOFOLDERSSENDEMAILNOTIFICATIONS=NO
+SOGOINTERNALSYNCINTERVAL=30
+SOGOMAXIMUMPINGINTERVAL=3540
+SOGOMAXIMUMSYNCINTERVAL=3540
+SOGOMAXIMUMSYNCRESPONSESIZE=2048
+SOGOMAXIMUMSYNCWINDOWSIZE=100
+SXVMEMLIMIT=512
+WOWATCHDOGREQUESTTIMEOUT=60
+```
 
-Furthermore if smarthost setup is changed when sogo is already
-running, the event handler `events/smarthost-changed/10reload_services`
-restarts the main module service.
+## Backup database
 
-See also the `systemd/user/sogo.service` file.
+You can enable a databse backup for each users of their addressbooks and their calendars, older entries more than 31 days are removed. The syntax is cron based, in the example it will be triggered each day at 00h30
 
-This setting discovery is just an example to understand how the module is
-expected to work: it can be rewritten or discarded completely.
+```
+- BACKUPTIME=#30 0
++ BACKUPTIME=30 0
+```
 
 ## Uninstall
 
