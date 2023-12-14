@@ -23,9 +23,9 @@ config["host"] = os.getenv("TRAEFIK_HOST","")
 config["lets_encrypt"] = os.getenv("TRAEFIK_LETS_ENCRYPT") == "True"
 config["mail_server"] = os.getenv("MAIL_SERVER", "") # the value is the Mail module UUID!
 config["mail_domain"] = os.getenv("MAIL_DOMAIN", "") # the value is the mail domain of user to force domain identity : user@domain.com !
-config["admin_users"] = os.getenv("ADMIN_USERS", "")
+config["admin_users"] = os.getenv("ADMIN_USERS", "Administrator")
 config["ldap_domain"] = os.getenv("LDAP_DOMAIN", "")
-config["workers_count"] = os.getenv("WOWORKERSCOUNT", "")
+config["workers_count"] = os.getenv("WOWORKERSCOUNT", "3")
 config["auxiliary_account"] = os.getenv("AUXILIARYACCOUNT") == "True"
 config["activesync"] = os.getenv("ACTIVESYNC") == "True"
 config["dav"] = os.getenv("DAV") == "True"
