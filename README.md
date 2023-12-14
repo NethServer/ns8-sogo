@@ -13,6 +13,11 @@ Output example:
 
     {"module_id": "sogo1", "image_name": "sogo", "image_url": "ghcr.io/nethserver/sogo:latest"}
 
+## Get the configuration
+You can retrieve the configuration with
+
+api-cli run get-configuration --agent module/sogo1
+
 ## Configure
 
 Let's assume that the sogo instance is named `sogo1`.
