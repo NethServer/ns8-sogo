@@ -7,7 +7,5 @@
 
 # If the control reaches this step, the service can be enabled and started
 
-touch smarthost.env
-
 systemctl --user enable sogo.service
 systemctl --user restart sogo.service
