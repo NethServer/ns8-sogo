@@ -31,7 +31,6 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/sogo-app.pid \
     --volume ./config/sieve.creds:/etc/sogo/sieve.creds:Z \
     --volume ./config/SOGo.conf:/etc/httpd/conf/extra/SOGo.conf:Z \
     --volume ./backups:/etc/sogo/backups:Z \
-    --env=SOGO_* \
     ${SOGO_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/sogo-app.ctr-id -t 10
 ExecReload=/usr/bin/podman kill -s HUP sogo-app
