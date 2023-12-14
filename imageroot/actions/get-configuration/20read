@@ -27,6 +27,8 @@ config["admin_users"] = os.getenv("ADMIN_USERS", "")
 config["ldap_domain"] = os.getenv("LDAP_DOMAIN", "")
 config["workers_count"] = os.getenv("WOWORKERSCOUNT", "")
 config["auxiliary_account"] = os.getenv("AUXILIARYACCOUNT") == "True"
+config["activesync"] = os.getenv("ACTIVESYNC") == "True"
+config["dav"] = os.getenv("DAV") == "True"
 
 rdb = agent.redis_connect() # full read-only access on every key
 
