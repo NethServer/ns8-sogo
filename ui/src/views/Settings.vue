@@ -22,132 +22,206 @@
     <cv-row>
       <cv-column>
         <cv-tile light>
-            <cv-skeleton-text
+          <cv-skeleton-text
             v-show="loading.getConfiguration"
-              heading
-              paragraph
-              :line-count="15"
-              width="80%"
-            ></cv-skeleton-text>
-            <cv-form  v-show="!loading.getConfiguration" @submit.prevent="configureModule">
-              <cv-text-input
-                :label="$t('settings.SOGo_fqdn')"
-                placeholder="SOGo.example.org"
-                v-model.trim="host"
-                class="mg-bottom"
-                :invalid-message="$t(error.host)"
-                :disabled="loading.getConfiguration || loading.configureModule"
-                ref="host"
-              >
-              </cv-text-input>
-              <cv-toggle
-                value="letsEncrypt"
-                :label="$t('settings.lets_encrypt')"
-                v-model="isLetsEncryptEnabled"
-                :disabled="loading.getConfiguration || loading.configureModule"
-                class="mg-bottom"
-              >
-                <template slot="text-left">{{
-                  $t("settings.disabled")
-                }}</template>
-                <template slot="text-right">{{
-                  $t("settings.enabled")
-                }}</template>
-              </cv-toggle>
-              <NsComboBox
-                v-model.trim="mail_server"
-                :autoFilter="true"
-                :autoHighlight="true"
-                :title="$t('settings.mail_server_fqdn')"
-                :label="$t('settings.choose_mail_server')"
-                :options="mail_server_URL"
-                :userInputLabel="core.$t('settings.choose_mail_server')"
-                :acceptUserInput="false"
-                :showItemType="true"
-                :invalid-message="$t(error.mail_server)"
-                :disabled="loading.getConfiguration || loading.configureModule"
-                tooltipAlignment="start"
-                tooltipDirection="top"
-                ref="mail_server"
-              >
-                <template slot="tooltip">
-                  {{ $t("settings.choose_the_mail_server_to_use") }}
-                </template>
-              </NsComboBox>
-              <NsComboBox
-                v-model.trim="ldap_domain"
-                :autoFilter="true"
-                :autoHighlight="true"
-                :title="$t('settings.ldap_domain')"
-                :label="$t('settings.choose_ldap_domain')"
-                :options="user_domains_list"
-                :userInputLabel="core.$t('settings.choose_ldap_domain')"
-                :acceptUserInput="false"
-                :showItemType="true"
-                :invalid-message="$t(error.ldap_domain)"
-                :disabled="loading.getConfiguration || loading.configureModule"
-                tooltipAlignment="start"
-                tooltipDirection="top"
-                ref="ldap_domain"
-              >
-                <template slot="tooltip">
-                  {{
-                    $t("settings.choose_the_ldap_domain_to_authenticate_users")
-                  }}
-                </template>
-              </NsComboBox>
-              <!-- advanced options -->
-              <cv-accordion ref="accordion" class="maxwidth mg-bottom">
-                <cv-accordion-item :open="toggleAccordion[0]">
-                  <template slot="title">{{
-                    $t("settings.advanced")
-                  }}</template>
-                  <template slot="content">
-                    <!-- <cv-text-input
-                    :label="$t('settings.plugins')"
-                    :placeholder="$t('settings.placeholder_plugins')"
-                    v-model.trim="plugins"
-                    class="mg-bottom"
-                    :invalid-message="$t(error.plugins)"
+            heading
+            paragraph
+            :line-count="15"
+            width="80%"
+          ></cv-skeleton-text>
+          <cv-form
+            v-show="!loading.getConfiguration"
+            @submit.prevent="configureModule"
+          >
+            <cv-text-input
+              :label="$t('settings.SOGo_fqdn')"
+              placeholder="SOGo.example.org"
+              v-model.trim="host"
+              class="mg-bottom"
+              :invalid-message="$t(error.host)"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              ref="host"
+            >
+            </cv-text-input>
+            <NsToggle
+              value="letsEncrypt"
+              :label="$t('settings.lets_encrypt')"
+              v-model="isLetsEncryptEnabled"
+              :form-item="true"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              class="mg-bottom"
+            >
+              <template slot="text-left">{{
+                $t("settings.disabled")
+              }}</template>
+              <template slot="text-right">{{
+                $t("settings.enabled")
+              }}</template>
+            </NsToggle>
+            <NsComboBox
+              v-model.trim="mail_server"
+              :autoFilter="true"
+              :autoHighlight="true"
+              :title="$t('settings.mail_server_fqdn')"
+              :label="$t('settings.choose_mail_server')"
+              :options="mail_server_URL"
+              :userInputLabel="core.$t('settings.choose_mail_server')"
+              :acceptUserInput="false"
+              :showItemType="true"
+              :invalid-message="$t(error.mail_server)"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              tooltipAlignment="start"
+              tooltipDirection="top"
+              ref="mail_server"
+            >
+              <template slot="tooltip">
+                {{ $t("settings.choose_the_mail_server_to_use") }}
+              </template>
+            </NsComboBox>
+            <NsComboBox
+              v-model.trim="ldap_domain"
+              :autoFilter="true"
+              :autoHighlight="true"
+              :title="$t('settings.ldap_domain')"
+              :label="$t('settings.choose_ldap_domain')"
+              :options="user_domains_list"
+              :userInputLabel="core.$t('settings.choose_ldap_domain')"
+              :acceptUserInput="false"
+              :showItemType="true"
+              :invalid-message="$t(error.ldap_domain)"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              tooltipAlignment="start"
+              tooltipDirection="top"
+              ref="ldap_domain"
+            >
+              <template slot="tooltip">
+                {{
+                  $t("settings.choose_the_ldap_domain_to_authenticate_users")
+                }}
+              </template>
+            </NsComboBox>
+            <!-- advanced options -->
+            <cv-accordion ref="accordion" class="maxwidth mg-bottom">
+              <cv-accordion-item :open="toggleAccordion[0]">
+                <template slot="title">{{ $t("settings.advanced") }}</template>
+                <template slot="content">
+                  <cv-text-area
+                    :label="$t('settings.adminList')"
+                    v-model.trim="admin_users"
+                    :invalid-message="error.admin_users"
+                    :helper-text="$t('settings.Write_administrator_list')"
+                    :value="admin_users"
+                    class="maxwidth textarea mg-left"
+                    ref="admin_users"
+                    :placeholder="$t('settings.Write_administrator_list')"
                     :disabled="
                       loading.getConfiguration || loading.configureModule
                     "
-                    ref="plugins"
                   >
-                  </cv-text-input>
-                  <cv-text-input
-                    :label="$t('settings.upload_max_filesize')"
-                    placeholder="5"
-                    v-model.trim="upload_max_filesize"
-                    class="mg-bottom"
-                    :invalid-message="$t(error.upload_max_filesize)"
+                  </cv-text-area>
+                  <NsToggle
+                    value="auxiliary_account"
+                    :label="$t('settings.auxiliary_account')"
+                    v-model="isAuxiliaryAccountEnabled"
+                    :form-item="true"
                     :disabled="
                       loading.getConfiguration || loading.configureModule
                     "
-                    ref="upload_max_filesize"
+                    class="mg-bottom"
                   >
-                  </cv-text-input> -->
-                  </template>
-                </cv-accordion-item>
-              </cv-accordion>
-              <cv-row v-if="error.configureModule">
-                <cv-column>
-                  <NsInlineNotification
-                    kind="error"
-                    :title="$t('action.configure-module')"
-                    :description="error.configureModule"
-                    :showCloseButton="false"
-                  />
-                </cv-column>
-              </cv-row>
-              <NsButton
-                kind="primary"
-                :icon="Save20"
-                :loading="loading.configureModule"
-                :disabled="loading.getConfiguration || loading.configureModule"
-                >{{ $t("settings.save") }}</NsButton
-              >
-            </cv-form>
+                    <template slot="tooltip">
+                      <span
+                        v-html="$t('settings.auxiliary_account_tips')"
+                      ></span>
+                    </template>
+                    <template slot="text-left">{{
+                      $t("settings.disabled")
+                    }}</template>
+                    <template slot="text-right">{{
+                      $t("settings.enabled")
+                    }}</template>
+                  </NsToggle>
+                  <NsToggle
+                    value="dav"
+                    :label="$t('settings.dav')"
+                    v-model="isDavEnabled"
+                    :form-item="true"
+                    :disabled="
+                      loading.getConfiguration || loading.configureModule
+                    "
+                    class="mg-bottom"
+                  >
+                    <template slot="tooltip">
+                      <span v-html="$t('settings.dav_tips')"></span>
+                    </template>
+                    <template slot="text-left">{{
+                      $t("settings.disabled")
+                    }}</template>
+                    <template slot="text-right">{{
+                      $t("settings.enabled")
+                    }}</template>
+                  </NsToggle>
+                  <NsToggle
+                    value="activesync"
+                    :label="$t('settings.activesync')"
+                    v-model="isActivesyncEnabled"
+                    :form-item="true"
+                    :disabled="
+                      loading.getConfiguration || loading.configureModule
+                    "
+                    class="mg-bottom"
+                  >
+                    <template slot="tooltip">
+                      <span v-html="$t('settings.activesync_tips')"></span>
+                    </template>
+                    <template slot="text-left">{{
+                      $t("settings.disabled")
+                    }}</template>
+                    <template slot="text-right">{{
+                      $t("settings.enabled")
+                    }}</template>
+                  </NsToggle>
+                  <NsTextInput
+                    :label="$t('settings.workers_count')"
+                    :placeholder="$t('settings.workers_count_placeholder')"
+                    v-model.trim="workers_count"
+                    type="number"
+                    min="3"
+                    max="100"
+                    class="mg-bottom"
+                    :invalid-message="error.workers_count"
+                    :disabled="
+                      loading.getConfiguration || loading.configureModule
+                    "
+                    ref="workers_count"
+                    tooltipAlignment="center"
+                    tooltipDirection="right"
+                  >
+                    <template slot="tooltip">
+                      <div v-html="$t('settings.workers_count_tips')"></div>
+                    </template>
+                  </NsTextInput>
+                </template>
+              </cv-accordion-item>
+            </cv-accordion>
+            <cv-row v-if="error.configureModule">
+              <cv-column>
+                <NsInlineNotification
+                  kind="error"
+                  :title="$t('action.configure-module')"
+                  :description="error.configureModule"
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
+            <NsButton
+              kind="primary"
+              :icon="Save20"
+              :loading="loading.configureModule"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              >{{ $t("settings.save") }}</NsButton
+            >
+          </cv-form>
         </cv-tile>
       </cv-column>
     </cv-row>
@@ -185,9 +259,14 @@ export default {
       urlCheckInterval: null,
       host: "",
       isLetsEncryptEnabled: false,
+      isActivesyncEnabled: true,
+      isDavEnabled: true,
+      isAuxiliaryAccountEnabled: true,
       ldap_domain: "",
       mail_server: "",
       mail_domain: "",
+      admin_users: "",
+      workers_count: "3",
       mail_server_URL: [],
       user_domains_list: [],
       loading: {
@@ -202,6 +281,8 @@ export default {
         http2https: "",
         mail_server: "",
         ldap_domain: "",
+        admin_users: "",
+        workers_count: "",
       },
     };
   },
@@ -268,6 +349,12 @@ export default {
       const config = taskResult.output;
       this.host = config.host;
       this.isLetsEncryptEnabled = config.lets_encrypt;
+      this.isActivesyncEnabled = config.activesync;
+      this.isDavEnabled = config.dav;
+      this.admin_users = config.admin_users.split(",").join("\n");
+      this.workers_count = config.workers_count.toString();
+      this.auxiliary_account = config.auxiliary_account;
+
       // force to reload mail_server value after dom update
       this.$nextTick(() => {
         const mail_server_tmp = config.mail_server;
@@ -368,9 +455,14 @@ export default {
           data: {
             host: this.host,
             lets_encrypt: this.isLetsEncryptEnabled,
+            activesync: this.isActivesyncEnabled,
+            dav: this.isDavEnabled,
             mail_server: mail_server_tmp,
             mail_domain: mail_domain_tmp,
             ldap_domain: this.ldap_domain,
+            admin_users: this.admin_users.split("\n").join(",").trim(),
+            workers_count: this.workers_count.toString(),
+            auxiliary_account: this.isAuxiliaryAccountEnabled,
           },
           extra: {
             title: this.$t("settings.instance_configuration", {
