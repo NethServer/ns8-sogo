@@ -40,7 +40,7 @@ buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=traefik@node:routeadm mail@any:mailadm" \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
-    --label="org.nethserver.images=docker.io/mariadb:10.11.6 ghcr.io/stephdl/sogo:5.9.0" \
+    --label="org.nethserver.images=docker.io/mariadb:10.11.6 ghcr.io/nethserver/sogo-server:latest" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
