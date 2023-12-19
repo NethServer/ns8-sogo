@@ -1,7 +1,7 @@
 {
   "name": "sogo",
   "description": {
-    "en": "My sogo module"
+    "en": "SOGo is a free and modern scalable groupware server."
   },
   "categories": ["collaboration"],
   "authors": [
