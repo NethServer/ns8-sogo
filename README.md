@@ -84,6 +84,12 @@ SXVMEMLIMIT=512
 WOWATCHDOGREQUESTTIMEOUT=60
 ```
 
+## Fine tuning
+
+SOGo must be tuned https://sogo.nu/files/docs/SOGoInstallationGuide.html#_microsoft_enterprise_activesync_tuning following the number of users, some settings can be tested.
+
+Keep in mind to set one worker per active user for the activesync connection. The  SXVMEMLIMIT https://sogo.nu/files/docs/SOGoInstallationGuide.html#_general_preferences>` could be be adjusted also, between 25MB to 45 MB per active user with the activesync service.
+
 ## Backup database
 
 You can enable a databse backup for each users of their addressbooks and their calendars, older entries more than 31 days are removed. The syntax is cron based, in the example it will be triggered each day at 00h30
