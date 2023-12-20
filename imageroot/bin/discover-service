@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2023 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# Find settings (port, ip, ..) of mail service among the cluster
+#
+
+import os
+import sys
+import json
+import agent
+
+# This script must rely on local node resources to ensure service startup
+# even if the leader node is not reachable: connect to local Redis
+# replica.
+rdb = agent.redis_connect(use_replica=True)
+
+imap = agent.list_service_providers(rdb, 'imap', 'tcp', {
+    'module_uuid': os.environ['MAIL_SERVER']
+})
+
+if len(imap) != 1:
+    # Only ONE provider for the same UUID is allowed. Zero means it is
+    # missing. More than one means the DB is inconsistent.
+    print(agent.SD_ERR + "Cannot find the imap service of my Mail module instance", os.environ['MAIL_SERVER'], file=sys.stderr)
+    sys.exit(4)
+
+smtp = agent.list_service_providers(rdb, 'submission', 'tcp', {
+    'module_uuid': os.getenv('MAIL_SERVER', '')
+})
+
+if len(smtp) != 1:
+    # Only ONE provider for the same UUID is allowed. Zero means it is
+    # missing. More than one means the DB is inconsistent.
+    print(agent.SD_ERR + "Cannot find the submission service of my Mail module instance", os.environ['MAIL_SERVER'], file=sys.stderr)
+    sys.exit(5)
+
+imap_port = imap[0]['port']
+imap_server = imap[0]['host']
+user_domain = os.getenv('MAIL_DOMAIN', imap[0]['user_domain'])
+
+smtp_port = smtp[0]['port']
+smtp_server = smtp[0]['host']
+
+envfile = "discovery_mail.env"
+
+# Using .tmp suffix: do not overwrite the target file until the new one is
+# saved to disk:
+with open(envfile + ".tmp", "w") as efp:
+    print(f"SOGO_IMAP_PORT={imap_port}", file=efp)
+    print(f"SOGO_SMTP_PORT={smtp_port}", file=efp)
+    print(f"SOGO_DEFAULT_HOST={imap_server}", file=efp)
+    print(f"SOGO_SMTP_SERVER={smtp_server}", file=efp)
+
+# Commit changes by replacing the existing envfile:
+os.replace(envfile + ".tmp", envfile)
+

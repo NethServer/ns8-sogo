@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2023 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import sys
+import json
+import agent
+from pathlib import Path
+
+# try to find the timezone except to UTC
+symlink_path = "/etc/localtime"
+resolved_path = Path(symlink_path).resolve()
+timezone = str(resolved_path.relative_to(Path("/usr/share/zoneinfo")))
+if not timezone:
+    timezone = "UTC"
+agent.set_env("TIMEZONE", timezone)
+
+request = json.load(sys.stdin)
+
+original_environment = request['environment']
+
+for evar in [
+"ACTIVESYNC",
+"ADMIN_USERS",
+"AUXILIARYACCOUNT",
+"BACKUPTIME",
+"DAV",
+"DRAFTSFOLDER",
+"LDAP_DOMAIN",
+"MAIL_DOMAIN",
+"MAIL_SERVER",
+"SENTFOLDER",
+"SESSIONDURATION",
+"SOGOACLSSENDEMAILNOTIFICATIONS",
+"SOGOAPPOINTMENTSENDEMAILNOTIFICATIONS",
+"SOGOENABLEEMAILALARMS",
+"SOGOFOLDERSSENDEMAILNOTIFICATIONS",
+"SOGOINTERNALSYNCINTERVAL",
+"SOGOMAXIMUMPINGINTERVAL",
+"SOGOMAXIMUMSYNCINTERVAL",
+"SOGOMAXIMUMSYNCRESPONSESIZE",
+"SOGOMAXIMUMSYNCWINDOWSIZE",
+"SXVMEMLIMIT",
+"TRAEFIK_HOST",
+"TRAEFIK_HTTP2HTTPS",
+"TRAEFIK_LETS_ENCRYPT",
+"TRASHFOLDER",
+"WOWATCHDOGREQUESTTIMEOUT",
+"WOWORKERSCOUNT"
+    ]:
+    agent.set_env(evar, original_environment[evar])
