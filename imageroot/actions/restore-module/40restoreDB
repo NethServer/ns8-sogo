@@ -18,7 +18,7 @@ mysql --version
 # The script is sourced, override entrypoint args and exit:
 set -- true
 docker_temp_server_stop
-exit 1
+exit 0
 EOS
 
 # once we exit we remove initdb.d
