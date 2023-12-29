@@ -36,6 +36,6 @@ podman run \
   --env MARIADB_ROOT_PASSWORD=Nethesis,1234 \
   --env MARIADB_DATABASE=sogo \
   --env MARIADB_USER=sogo \
-  --env MARIADB_PASSWORD=sogo \
+  --env MARIADB_PASSWORD=Nethesis,1234 \
   --replace --name=restore_db \
   ${MARIADB_IMAGE}
