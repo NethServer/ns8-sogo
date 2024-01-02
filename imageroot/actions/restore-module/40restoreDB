@@ -18,7 +18,7 @@ mysql --version
 # The script is sourced, override entrypoint args and exit:
 set -- true
 docker_temp_server_stop
-exit 1
+exit 0
 EOS
 
 # once we exit we remove initdb.d
@@ -36,6 +36,6 @@ podman run \
   --env MARIADB_ROOT_PASSWORD=Nethesis,1234 \
   --env MARIADB_DATABASE=sogo \
   --env MARIADB_USER=sogo \
-  --env MARIADB_PASSWORD=sogo \
+  --env MARIADB_PASSWORD=Nethesis,1234 \
   --replace --name=restore_db \
   ${MARIADB_IMAGE}
