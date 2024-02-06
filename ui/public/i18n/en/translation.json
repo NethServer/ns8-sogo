@@ -48,7 +48,8 @@
     "workers_count_tips": "Number of workers to use for SOGo",
     "workers_count_placeholder": "Default value is 3",
     "auxiliary_account": "Auxiliary email account",
-    "auxiliary_account_tips": "Users can add auxiliary email accounts to use with SOGo"
+    "auxiliary_account_tips": "Users can add auxiliary email accounts to use with SOGo",
+    "no_available_mail_domain_check_users": "No available mail domain, please check if users are added from user domain"
   },
   "about": {
     "title": "About"
