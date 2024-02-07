@@ -58,6 +58,16 @@
                 $t("settings.enabled")
               }}</template>
             </NsToggle>
+            <cv-row v-if="mail_server_URL.length === 0">
+              <cv-column>
+                <NsInlineNotification
+                  kind="warning"
+                  :title="$t('settings.mail_module_misconfigured')"
+                  :description="$t('settings.no_available_mail_domain_check_users')"
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
             <NsComboBox
               v-model.trim="mail_server"
               :autoFilter="true"
@@ -365,6 +375,11 @@ export default {
           this.mail_server = "";
         }
         this.ldap_domain = config.ldap_domain;
+        // if mail_server_URL is empty, set default value
+        if (this.mail_server_URL.length === 0) {
+          // we want to avoid to save the form, there is no users set in the mail domain
+          this.mail_server = "";
+        }
       });
 
       this.mail_server_URL = config.mail_server_URL;
