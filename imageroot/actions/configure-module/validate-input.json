@@ -35,7 +35,9 @@
             "type": "boolean"
         },
         "host": {
-            "type": "string"
+            "type": "string",
+            "format": "hostname",
+            "pattern": "\\."
         },
         "workers_count": {
             "type": "string"
