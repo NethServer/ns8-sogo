@@ -1,1 +1,26 @@
-../restore-module/50call-configure-module
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2023 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import sys
+import json
+import agent
+import os
+
+configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data={
+    "ldap_domain": os.environ["LDAP_DOMAIN"],
+    "admin_users": os.environ["ADMIN_USERS"],
+    "mail_server": os.environ["MAIL_SERVER"],
+    "mail_domain": os.environ["MAIL_DOMAIN"],
+    "lets_encrypt": os.environ["TRAEFIK_LETS_ENCRYPT"] == 'True',
+    "host": os.environ["TRAEFIK_HOST"],
+    "workers_count": os.environ["WOWORKERSCOUNT"],
+    "auxiliary_account": os.environ["AUXILIARYACCOUNT"] == 'True',
+    "activesync": os.environ["ACTIVESYNC"] == 'True',
+    "dav": os.environ["DAV"] == 'True',
+
+})
+agent.assert_exp(configure_retval['exit_code'] == 0, "The configure-module subtask failed!")
