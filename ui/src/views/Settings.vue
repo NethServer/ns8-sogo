@@ -63,7 +63,9 @@
                 <NsInlineNotification
                   kind="warning"
                   :title="$t('settings.mail_module_misconfigured')"
-                  :description="$t('settings.no_available_mail_domain_check_users')"
+                  :description="
+                    $t('settings.no_available_mail_domain_check_users')
+                  "
                   :showCloseButton="false"
                 />
               </cv-column>
@@ -387,6 +389,11 @@ export default {
       this.loading.getConfiguration = false;
       this.focusElement("host");
     },
+    isValidUser(user) {
+      // test if user is valid login
+      const re = /^[a-zA-Z0-9._-]+$/;
+      return re.test(user);
+    },
     validateConfigureModule() {
       this.clearErrors(this);
 
@@ -414,6 +421,24 @@ export default {
           this.focusElement("ldap_domain");
         }
         isValidationOk = false;
+      }
+      if (this.admin_users) {
+        // test if the admin_users is valid
+        const admin_users = this.admin_users.split("\n");
+        for (const user of admin_users) {
+          if (!this.isValidUser(user)) {
+            this.toggleAccordion[0] = true;
+            // set i18n error message and return user in object
+            this.error.admin_users = this.$t("settings.invalid_user", {
+              user: user,
+            });
+            isValidationOk = false;
+            if (isValidationOk) {
+              this.focusElement("admin_users");
+            }
+            break;
+          }
+        }
       }
       return isValidationOk;
     },
