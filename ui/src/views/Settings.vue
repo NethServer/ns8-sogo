@@ -500,7 +500,7 @@ export default {
             mail_server: mail_server_tmp,
             mail_domain: mail_domain_tmp,
             ldap_domain: this.ldap_domain,
-            admin_users: this.admin_users.split("\n").join(",").trim(),
+            admin_users: this.admin_users.split("\n").join(",").toLowerCase().trim(),
             workers_count: this.workers_count.toString(),
             auxiliary_account: this.isAuxiliaryAccountEnabled,
           },
