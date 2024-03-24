@@ -15,7 +15,7 @@ data = json.load(sys.stdin)
 
 # Setup configuration from user input.
 agent.set_env("MAIL_SERVER", data["mail_server"])
-agent.set_env("ADMIN_USERS", data.get("admin_users","Administrator"))
+agent.set_env("ADMIN_USERS", data.get("admin_users","administrator").lower())
 agent.set_env("LDAP_DOMAIN", data["ldap_domain"])
 agent.set_env("MAIL_DOMAIN",data.get("mail_domain",""))
 agent.set_env("WOWORKERSCOUNT",data.get("workers_count","3"))
