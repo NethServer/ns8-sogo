@@ -27,7 +27,7 @@ jenv = Environment(
 )
 
 properties = {
-    "admin_users" : os.environ['ADMIN_USERS'],
+    "admin_users" : os.environ['ADMIN_USERS'].lower(),
     "ldap_schema" : os.environ['SOGO_LDAP_SCHEMA'],
     "ldap_port" : int(os.environ['SOGO_LDAP_PORT']),
     "ldap_user" : os.environ['SOGO_LDAP_USER'],
