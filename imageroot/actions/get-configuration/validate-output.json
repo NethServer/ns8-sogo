@@ -10,7 +10,6 @@
             "mail_server": "f38f9911-8341-452e-8941-d889385a59a8",
             "mail_domain": "rocky9-pve4.org",
             "admin_users": "",
-            "ldap_domain": "rocky9-pve4.org",
             "workers_count": "20",
             "auxiliary_account": true,
             "activesync": true,
@@ -56,9 +55,6 @@
             "type": "string"
         },
         "admin_users": {
-            "type": "string"
-        },
-        "ldap_domain": {
             "type": "string"
         },
         "workers_count": {
@@ -124,7 +120,6 @@
         "mail_server",
         "mail_domain",
         "admin_users",
-        "ldap_domain",
         "workers_count",
         "auxiliary_account",
         "activesync",
