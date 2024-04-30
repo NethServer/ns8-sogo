@@ -90,28 +90,6 @@
                 {{ $t("settings.choose_the_mail_server_to_use") }}
               </template>
             </NsComboBox>
-            <NsComboBox
-              v-model.trim="ldap_domain"
-              :autoFilter="true"
-              :autoHighlight="true"
-              :title="$t('settings.ldap_domain')"
-              :label="$t('settings.choose_ldap_domain')"
-              :options="user_domains_list"
-              :userInputLabel="core.$t('settings.choose_ldap_domain')"
-              :acceptUserInput="false"
-              :showItemType="true"
-              :invalid-message="$t(error.ldap_domain)"
-              :disabled="loading.getConfiguration || loading.configureModule"
-              tooltipAlignment="start"
-              tooltipDirection="top"
-              ref="ldap_domain"
-            >
-              <template slot="tooltip">
-                {{
-                  $t("settings.choose_the_ldap_domain_to_authenticate_users")
-                }}
-              </template>
-            </NsComboBox>
             <!-- advanced options -->
             <cv-accordion ref="accordion" class="maxwidth mg-bottom">
               <cv-accordion-item :open="toggleAccordion[0]">
@@ -274,7 +252,6 @@ export default {
       isActivesyncEnabled: true,
       isDavEnabled: true,
       isAuxiliaryAccountEnabled: true,
-      ldap_domain: "",
       mail_server: "",
       mail_domain: "",
       admin_users: "",
@@ -292,7 +269,6 @@ export default {
         lets_encrypt: "",
         http2https: "",
         mail_server: "",
-        ldap_domain: "",
         admin_users: "",
         workers_count: "",
       },
@@ -376,7 +352,6 @@ export default {
         } else {
           this.mail_server = "";
         }
-        this.ldap_domain = config.ldap_domain;
         // if mail_server_URL is empty, set default value
         if (this.mail_server_URL.length === 0) {
           // we want to avoid to save the form, there is no users set in the mail domain
@@ -411,14 +386,6 @@ export default {
 
         if (isValidationOk) {
           this.focusElement("mail_server");
-        }
-        isValidationOk = false;
-      }
-      if (!this.ldap_domain) {
-        this.error.ldap_domain = "common.required";
-
-        if (isValidationOk) {
-          this.focusElement("ldap_domain");
         }
         isValidationOk = false;
       }
@@ -499,7 +466,6 @@ export default {
             dav: this.isDavEnabled,
             mail_server: mail_server_tmp,
             mail_domain: mail_domain_tmp,
-            ldap_domain: this.ldap_domain,
             admin_users: this.admin_users.split("\n").join(",").toLowerCase().trim(),
             workers_count: this.workers_count.toString(),
             auxiliary_account: this.isAuxiliaryAccountEnabled,
