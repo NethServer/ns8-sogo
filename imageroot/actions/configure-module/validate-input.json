@@ -6,7 +6,6 @@
     "examples": [
         {
             "mail_server": "f38f9911-8341-452e-8941-d889385a59a8",
-            "ldap_domain": "ad.domain.org",
             "admin_users": "Administrator,user1",
             "mail_domain": "domain.org",
             "lets_encrypt": false,
@@ -20,9 +19,6 @@
     "type": "object",
     "properties": {
         "mail_server": {
-            "type": "string"
-        },
-        "ldap_domain": {
             "type": "string"
         },
         "admin_users": {
@@ -54,7 +50,6 @@
     },
     "required": [
         "mail_server",
-        "ldap_domain",
         "admin_users",
         "mail_domain",
         "lets_encrypt",

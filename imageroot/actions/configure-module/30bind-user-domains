@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2024 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 import agent
-import json
 import os
-import sys
 
-request = json.load(sys.stdin)
+rdb = agent.redis_connect()
 
-# Bind the new domain, overriding previous values (unbind)
-agent.bind_user_domains([request["ldap_domain"]])
+providers = agent.list_service_providers(rdb, 'imap', 'tcp', {
+    'module_uuid': os.environ['MAIL_SERVER']
+})
+
+if providers:
+    user_domain = providers[0]['user_domain']
+    agent.bind_user_domains([user_domain])
+    agent.set_env('LDAP_DOMAIN', user_domain)
