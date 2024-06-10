@@ -11,7 +11,6 @@ import agent
 import os
 
 configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data={
-    "ldap_domain": os.environ["LDAP_DOMAIN"],
     "admin_users": os.environ["ADMIN_USERS"],
     "mail_server": os.environ["MAIL_SERVER"],
     "mail_domain": os.environ["MAIL_DOMAIN"],

@@ -14,16 +14,15 @@ request = json.load(sys.stdin)
 renv = request['environment']
 
 configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data={
-    "ldap_domain": renv["LDAP_DOMAIN"],
     "admin_users": renv["ADMIN_USERS"],
     "mail_server": renv["MAIL_SERVER"],
     "mail_domain": renv["MAIL_DOMAIN"],
-    "lets_encrypt": renv["TRAEFIK_LETS_ENCRYPT"],
+    "lets_encrypt": renv["TRAEFIK_LETS_ENCRYPT"] == 'True',
     "host": renv["TRAEFIK_HOST"],
     "workers_count": renv["WOWORKERSCOUNT"],
-    "auxiliary_account": renv["AUXILIARYACCOUNT"],
-    "activesync": renv["ACTIVESYNC"],
-    "dav": renv["DAV"],
+    "auxiliary_account": renv["AUXILIARYACCOUNT"] == 'True',
+    "activesync": renv["ACTIVESYNC"] == 'True',
+    "dav": renv["DAV"] == 'True',
 
 })
 agent.assert_exp(configure_retval['exit_code'] == 0, "The configure-module subtask failed!")
