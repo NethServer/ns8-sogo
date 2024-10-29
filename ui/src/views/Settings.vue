@@ -120,9 +120,7 @@
                     class="mg-bottom"
                   >
                     <template slot="tooltip">
-                      <span
-                        v-html="$t('settings.auxiliary_account_tips')"
-                      ></span>
+                      <span>{{ $t("settings.auxiliary_account_tips") }}</span>
                     </template>
                     <template slot="text-left">{{
                       $t("settings.disabled")
@@ -142,7 +140,7 @@
                     class="mg-bottom"
                   >
                     <template slot="tooltip">
-                      <span v-html="$t('settings.dav_tips')"></span>
+                      <span>{{ $t("settings.dav_tips") }}</span>
                     </template>
                     <template slot="text-left">{{
                       $t("settings.disabled")
@@ -162,7 +160,7 @@
                     class="mg-bottom"
                   >
                     <template slot="tooltip">
-                      <span v-html="$t('settings.activesync_tips')"></span>
+                      <span>{{ $t("settings.activesync_tips") }}</span>
                     </template>
                     <template slot="text-left">{{
                       $t("settings.disabled")
@@ -188,7 +186,7 @@
                     tooltipDirection="right"
                   >
                     <template slot="tooltip">
-                      <div v-html="$t('settings.workers_count_tips')"></div>
+                      <div>{{ $t("settings.workers_count_tips") }}</div>
                     </template>
                   </NsTextInput>
                 </template>
@@ -466,7 +464,11 @@ export default {
             dav: this.isDavEnabled,
             mail_server: mail_server_tmp,
             mail_domain: mail_domain_tmp,
-            admin_users: this.admin_users.split("\n").join(",").toLowerCase().trim(),
+            admin_users: this.admin_users
+              .split("\n")
+              .join(",")
+              .toLowerCase()
+              .trim(),
             workers_count: this.workers_count.toString(),
             auxiliary_account: this.isAuxiliaryAccountEnabled,
           },
