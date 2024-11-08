@@ -90,6 +90,29 @@ SOGo must be tuned https://sogo.nu/files/docs/SOGoInstallationGuide.html#_micros
 
 Keep in mind to set one worker per active user for the activesync connection. The  SXVMEMLIMIT https://sogo.nu/files/docs/SOGoInstallationGuide.html#_general_preferences could be be adjusted also, between 25MB to 45 MB per active user with the activesync service.
 
+## Custom configuration files
+
+You can modify the configuration by adding new files to the folder `templates`, if the files are present they are used instead of the default one and they are included in the backup of the module
+
+- sogo configuration: templates/sogo.conf.local
+- apache configuration: templates/SOGo.conf.local
+- cron configuration: templates/cron.conf.local
+
+```
+runagent -m sogo1
+# copy the relevant files (copy and edit only the file you need)
+cp ../templates/sogo.conf templates/sogo.conf.local 
+cp ../templates/SOGo.conf templates/SOGo.conf.local 
+cp ../templates/cron.conf templates/cron.conf.local 
+# edit the files
+vim template/sogo.conf.local
+vim templates/SOGo.conf.local
+vim templates/cron.conf.local
+# restart the service
+systemctl restart --user sogo
+```
+
+
 ## Backup database
 
 You can enable a databse backup for each users of their addressbooks and their calendars, older entries more than 31 days are removed. The syntax is cron based, in the example it will be triggered each day at 00h30. the backup is disabled by default
