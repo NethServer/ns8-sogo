@@ -13,7 +13,7 @@ import socket
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-files =["config/sogo.conf","config/SOGo.conf"]
+files =["config/sogo.conf","config/SOGo.conf","config/cron-sogo"]
 for f in files:
     try:
         os.remove(f)
@@ -25,7 +25,11 @@ jenv = Environment(
     autoescape=select_autoescape(),
     keep_trailing_newline=True,
 )
-
+jenv_custom = Environment(
+    loader=FileSystemLoader(os.getenv("AGENT_INSTALL_DIR")+"/state/templates"),
+    autoescape=select_autoescape(),
+    keep_trailing_newline=True,
+)
 properties = {
     "admin_users" : os.environ['ADMIN_USERS'].lower(),
     "ldap_schema" : os.environ['SOGO_LDAP_SCHEMA'],
@@ -58,8 +62,11 @@ properties = {
     "trashfolder": os.environ['TRASHFOLDER'],
     "wowatchdogrequesttimeout": os.environ['WOWATCHDOGREQUESTTIMEOUT']
 }
-
-template = jenv.get_template('sogo.conf')
+# test if sogo.conf.local exists
+if os.path.exists("templates/sogo.conf.local"):
+    template = jenv_custom.get_template('sogo.conf.local')
+else:
+    template = jenv.get_template('sogo.conf')
 output = template.render(properties)
 with open("config/sogo.conf","w") as f:
     f.write(output)
@@ -70,8 +77,11 @@ properties = {
     "active_sync": True if os.environ['ACTIVESYNC'] == 'True' else False,
     "dav": True if os.environ['DAV'] == 'True' else False
 }
-
-template = jenv.get_template('SOGo.conf')
+# test if SOGo.conf.local exists
+if os.path.exists("templates/SOGo.conf.local"):
+    template = jenv_custom.get_template('SOGo.conf.local')
+else:
+    template = jenv.get_template('SOGo.conf')
 output = template.render(properties)
 with open("config/SOGo.conf","w") as f:
     f.write(output)
@@ -81,8 +91,11 @@ properties = {
     "backuptime": os.environ['BACKUPTIME'],
     "sessionduration": os.environ['SESSIONDURATION']
 }
-
-template = jenv.get_template('cron.conf')
+# test if cron.conf.local exists
+if os.path.exists("templates/cron.conf.local"):
+    template = jenv_custom.get_template('cron.conf.local')
+else:
+    template = jenv.get_template('cron.conf')
 output = template.render(properties)
 with open("config/cron-sogo","w") as f:
     f.write(output)
