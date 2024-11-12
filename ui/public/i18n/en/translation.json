@@ -18,7 +18,11 @@
     "mount": "Mount",
     "no_services": "No services",
     "no_images": "No images",
-    "no_volumes": "No volumes"
+    "no_volumes": "No volumes",
+    "not_configured": "Not configured",
+    "sogo_webapp": "SOGo webmail",
+    "open_webapp": "Open SOGo",
+    "configure": "Configure"
   },
   "settings": {
     "title": "Settings",
@@ -37,7 +41,7 @@
     "mail_server_is_not_valid": "This mail server cannot be used by SOGo webmail",
     "adminList": "Administrator list",
     "Write_administrator_list": "Write one administrator per line",
-    "dav_tips":"Dav allows to synchronize calendars and adressbooks",
+    "dav_tips": "Dav allows to synchronize calendars and adressbooks",
     "dav": "DAV",
     "activesync": "ActiveSync",
     "activesync_tips": "ActiveSync allows to syncronize mobile devices",
@@ -78,6 +82,7 @@
     "403": "Operation not authorized",
     "404": "Resource not found",
     "cannot_retrieve_module_info": "Cannot retrieve module info",
-    "cannot_retrieve_installed_modules": "Cannot retrieve installed modules"
+    "cannot_retrieve_installed_modules": "Cannot retrieve installed modules",
+    "cannot_retrieve_configuration": "Cannot retrieve configuration"
   }
 }
