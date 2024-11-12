@@ -62,7 +62,7 @@ properties = {
     "trashfolder": os.environ['TRASHFOLDER'],
     "wowatchdogrequesttimeout": os.environ['WOWATCHDOGREQUESTTIMEOUT']
 }
-# test if sogo.con.local exists
+# test if sogo.conf.local exists
 if os.path.exists("templates/sogo.conf.local"):
     template = jenv_custom.get_template('sogo.conf.local')
 else:
