@@ -74,8 +74,6 @@
           </template>
         </NsInfoCard>
       </cv-column>
-    </cv-row>
-    <cv-row>
       <cv-column :md="4" :max="4">
         <NsInfoCard
           light
