@@ -339,7 +339,7 @@ export default {
       this.isDavEnabled = config.dav;
       this.admin_users = config.admin_users.split(",").join("\n");
       this.workers_count = config.workers_count.toString();
-      this.auxiliary_account = config.auxiliary_account;
+      this.isAuxiliaryAccountEnabled = config.auxiliary_account;
 
       // force to reload mail_server value after dom update
       this.$nextTick(() => {
