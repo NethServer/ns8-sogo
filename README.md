@@ -112,6 +112,22 @@ vim templates/cron.conf.local
 systemctl restart --user sogo
 ```
 
+## Customize SOGo theme
+
+You can customize the SOGo theme by dropping files in folders `./state{js,css,img}` and by restarting sogo
+
+`runagent -m sogo1`
+
+wget your files
+
+```
+wget -O js/custom.js https://example.com/some-script.js
+wget -O img/custom.svg https://example.com/some-image.svg
+wget -O css/custom.css https://example.com/class.css
+systemctl restart --user sogo
+```
+
+The files are included in the backup of the module
 
 ## Backup database
 
