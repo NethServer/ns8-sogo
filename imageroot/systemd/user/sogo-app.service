@@ -16,7 +16,7 @@ EnvironmentFile=-%S/state/discovery_ldap.env
 WorkingDirectory=%S/state
 Restart=always
 TimeoutStopSec=70
-ExecStartPre=/usr/bin/bash -c "/bin/mkdir -p {config,backups,templates}"
+ExecStartPre=/usr/bin/bash -c "/bin/mkdir -p {config,backups,templates,css,img,js}"
 ExecStartPre=/bin/rm -f %t/sogo-app.pid %t/sogo-app.ctr-id
 ExecStartPre=/usr/local/bin/runagent discover-service
 ExecStartPre=/usr/local/bin/runagent discover-ldap
@@ -31,6 +31,9 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/sogo-app.pid \
     --volume ./config/sieve.creds:/etc/sogo/sieve.creds:Z \
     --volume ./config/SOGo.conf:/etc/httpd/conf/extra/SOGo.conf:Z \
     --volume ./backups:/etc/sogo/backups:Z \
+    --volume ./css:/usr/lib/GNUstep/SOGo/WebServerResources/css:Z \
+    --volume ./img:/usr/lib/GNUstep/SOGo/WebServerResources/img:Z \
+    --volume ./js:/usr/lib/GNUstep/SOGo/WebServerResources/js:Z \
     ${SOGO_SERVER_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/sogo-app.ctr-id -t 10
 ExecReload=/usr/bin/podman kill -s HUP sogo-app
