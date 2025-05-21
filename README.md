@@ -209,9 +209,13 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/sogo-app.pid \
 ### Lines below this comment will be discarded
 ```    
 
-Edit `sogo.conf` to add the custom theme:
+Copy the original template to the templates directory to be able to customize it and to ensure it is included in the backup:
 
-    runagent -m sogo1 nano ../templates/sogo.conf
+    runagent -m sogo1 cp ../templates/sogo.conf ./templates/sogo.conf.local
+
+Edit `sogo.conf.local` to add the custom theme:
+
+    runagent -m sogo1 nano templates/sogo.conf.local
 
 Add following line at the end before the closing bracket:
 
