@@ -130,6 +130,104 @@ or for all users:
 
   `sogo-restore-user /var/lib/sogo/backups/sogo-2017-12-10_0030/ -A`
 
+## Customizing theme and logo
+
+The files for the theme `custom_theme.js` and the logo `logo-full.svg` to customize the SOGo instance `sogo1` need to be located in `/home/sogo1/.config/state` and owned by user `sogo1`.
+
+Here is an example of a `custom_theme.js`:
+
+```
+(function() {
+    'use strict';
+
+    angular.module('SOGo.Common')
+      .config(configure)
+
+    /**
+     * @ngInject
+     */
+    configure.$inject = ['$mdThemingProvider'];
+    function configure($mdThemingProvider) {
+      var blueMap = $mdThemingProvider.extendPalette('indigo', {
+        '200': '#3e4044',
+        '300': '#292b30',
+        '1000': '#4C566A',
+        '50': '#313131',
+        'A100': '#444444',
+        '500': '#00558c',
+        'contrastDefaultColor': 'light',
+        'contrastLightColors': '50 100 200 300 400 500 600 A100 A200 A400 A700',
+        'contrastStrongLightColors': '700 800 900 A700'
+      });
+      $mdThemingProvider.definePalette('frost-grey', blueMap);
+
+      $mdThemingProvider.theme('default')
+        .primaryPalette('indigo', {
+          'default': '400',
+          'hue-1': '400',
+          'hue-2': '600',
+          'hue-3': 'A700'
+        })
+        .accentPalette('grey', {
+          'default': '400',
+          'hue-1': '300',
+          'hue-2': '500',
+          'hue-3': 'A700'
+        })
+        .backgroundPalette('grey');
+
+      $mdThemingProvider.generateThemesOnDemand(false);
+    }
+  })();
+```
+
+The sogo-app service file needs to be edited to add the files as volumes:
+
+    runagent -m sogo1 systemctl --user edit sogo-app
+
+Following content needs to be written between the commented blocks to work. It's basically the `ExecStart` line from `/home/sogo1/.config/systemd/user/sogo-app.service` with 2 volumes added for the `custom_theme.js` and the `sogo-full.svg`.
+This way the original `ExecStart` directive is overridden.
+
+```
+### Editing /home/sogo2/.config/systemd/user/sogo-app.service.d/override.conf
+### Anything between here and the comment below will become the new contents of the file
+
+[Service]
+ExecStart=
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/sogo-app.pid \
+     --cidfile %t/sogo-app.ctr-id --cgroups=no-conmon \
+     --pod-id-file %t/sogo.pod-id --replace -d --name  sogo-app \
+     --volume ./config/sogo.conf:/etc/sogo/sogo.conf:Z \
+     --volume ./config/cron-sogo:/etc/cron.d/cron-sogo:Z \
+     --volume ./config/sieve.creds:/etc/sogo/sieve.creds:Z \
+     --volume ./config/SOGo.conf:/etc/httpd/conf/extra/SOGo.conf:Z \
+     --volume ./backups:/etc/sogo/backups:Z \
+     --volume %S/state/custom_theme.js:/usr/lib/GNUstep/SOGo/WebServerResources/js/custom_theme.js:Z \
+     --volume %S/state/sogo-full.svg:/usr/lib/GNUstep/SOGo/WebServerResources/img/sogo-full.svg:Z \
+     ${SOGO_SERVER_IMAGE}
+
+### Lines below this comment will be discarded
+```    
+
+Copy the original template to the templates directory to be able to customize it and to ensure it is included in the backup:
+
+    runagent -m sogo1 cp ../templates/sogo.conf ./templates/sogo.conf.local
+
+Edit `sogo.conf.local` to add the custom theme:
+
+    runagent -m sogo1 nano templates/sogo.conf.local
+
+Add following line at the end before the closing bracket:
+
+```
+  SOGoUIAdditionalJSFiles = (js/custom_theme.js);
+}
+```
+
+Restart the SOGo service to apply the changes:
+
+    runagent -m sogo1 systemctl --user restart sogo
+
 ## Uninstall
 
 To uninstall the instance:
