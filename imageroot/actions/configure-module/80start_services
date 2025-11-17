@@ -8,4 +8,4 @@
 # If the control reaches this step, the service can be enabled and started
 
 systemctl --user enable sogo.service
-systemctl --user restart sogo.service
+systemctl --user restart sogo.service mariadb-app.service sogo-app.service

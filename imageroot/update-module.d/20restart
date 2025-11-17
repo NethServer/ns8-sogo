@@ -11,4 +11,4 @@ set -e
 exec 1>&2
 
 # Restart if running, ignore if stopped
-systemctl --user try-restart sogo.service
+systemctl --user try-restart sogo.service mariadb-app.service sogo-app.service

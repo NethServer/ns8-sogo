@@ -39,18 +39,27 @@
               v-model.trim="host"
               class="mg-bottom"
               :invalid-message="$t(error.host)"
-              :disabled="loading.getConfiguration || loading.configureModule"
+              :disabled="stillLoading"
               ref="host"
             >
             </cv-text-input>
             <NsToggle
               value="letsEncrypt"
-              :label="$t('settings.lets_encrypt')"
+              :label="core.$t('apps_lets_encrypt.request_https_certificate')"
               v-model="isLetsEncryptEnabled"
-              :form-item="true"
-              :disabled="loading.getConfiguration || loading.configureModule"
+              :disabled="stillLoading"
               class="mg-bottom"
             >
+              <template #tooltip>
+                <div class="mg-bottom-sm">
+                  {{ core.$t("apps_lets_encrypt.lets_encrypt_tips") }}
+                </div>
+                <div class="mg-bottom-sm">
+                  <cv-link @click="goToCertificates">
+                    {{ core.$t("apps_lets_encrypt.go_to_tls_certificates") }}
+                  </cv-link>
+                </div>
+              </template>
               <template slot="text-left">{{
                 $t("settings.disabled")
               }}</template>
@@ -58,6 +67,29 @@
                 $t("settings.enabled")
               }}</template>
             </NsToggle>
+            <cv-row
+              v-if="isLetsEncryptCurrentlyEnabled && !isLetsEncryptEnabled"
+            >
+              <cv-column>
+                <NsInlineNotification
+                  kind="warning"
+                  :title="
+                    core.$t('apps_lets_encrypt.lets_encrypt_disabled_warning')
+                  "
+                  :description="
+                    core.$t(
+                      'apps_lets_encrypt.lets_encrypt_disabled_warning_description',
+                      {
+                        node: this.status.node_ui_name
+                          ? this.status.node_ui_name
+                          : this.status.node,
+                      }
+                    )
+                  "
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
             <cv-row v-if="mail_server_URL.length === 0">
               <cv-column>
                 <NsInlineNotification
@@ -81,7 +113,7 @@
               :acceptUserInput="false"
               :showItemType="true"
               :invalid-message="$t(error.mail_server)"
-              :disabled="loading.getConfiguration || loading.configureModule"
+              :disabled="stillLoading"
               tooltipAlignment="start"
               tooltipDirection="top"
               ref="mail_server"
@@ -104,9 +136,7 @@
                     class="maxwidth textarea mg-left"
                     ref="admin_users"
                     :placeholder="$t('settings.Write_administrator_list')"
-                    :disabled="
-                      loading.getConfiguration || loading.configureModule
-                    "
+                    :disabled="stillLoading"
                   >
                   </cv-text-area>
                   <NsToggle
@@ -114,9 +144,7 @@
                     :label="$t('settings.auxiliary_account')"
                     v-model="isAuxiliaryAccountEnabled"
                     :form-item="true"
-                    :disabled="
-                      loading.getConfiguration || loading.configureModule
-                    "
+                    :disabled="stillLoading"
                     class="mg-bottom"
                   >
                     <template slot="tooltip">
@@ -134,9 +162,7 @@
                     :label="$t('settings.dav')"
                     v-model="isDavEnabled"
                     :form-item="true"
-                    :disabled="
-                      loading.getConfiguration || loading.configureModule
-                    "
+                    :disabled="stillLoading"
                     class="mg-bottom"
                   >
                     <template slot="tooltip">
@@ -154,9 +180,7 @@
                     :label="$t('settings.activesync')"
                     v-model="isActivesyncEnabled"
                     :form-item="true"
-                    :disabled="
-                      loading.getConfiguration || loading.configureModule
-                    "
+                    :disabled="stillLoading"
                     class="mg-bottom"
                   >
                     <template slot="tooltip">
@@ -178,9 +202,7 @@
                     max="100"
                     class="mg-bottom"
                     :invalid-message="error.workers_count"
-                    :disabled="
-                      loading.getConfiguration || loading.configureModule
-                    "
+                    :disabled="stillLoading"
                     ref="workers_count"
                     tooltipAlignment="center"
                     tooltipDirection="right"
@@ -202,11 +224,43 @@
                 />
               </cv-column>
             </cv-row>
+            <cv-row v-if="error.getStatus">
+              <cv-column>
+                <NsInlineNotification
+                  kind="error"
+                  :title="$t('action.get-status')"
+                  :description="error.getStatus"
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
+            <cv-row v-if="validationErrorDetails.length">
+              <cv-column>
+                <NsInlineNotification
+                  kind="error"
+                  :title="
+                    core.$t('apps_lets_encrypt.cannot_obtain_certificate')
+                  "
+                  :showCloseButton="false"
+                >
+                  <template #description>
+                    <div class="flex flex-col gap-2">
+                      <div
+                        v-for="(detail, index) in validationErrorDetails"
+                        :key="index"
+                      >
+                        {{ detail }}
+                      </div>
+                    </div>
+                  </template>
+                </NsInlineNotification>
+              </cv-column>
+            </cv-row>
             <NsButton
               kind="primary"
               :icon="Save20"
               :loading="loading.configureModule"
-              :disabled="loading.getConfiguration || loading.configureModule"
+              :disabled="stillLoading"
               >{{ $t("settings.save") }}</NsButton
             >
           </cv-form>
@@ -244,9 +298,12 @@ export default {
       q: {
         page: "settings",
       },
+      status: {},
+      validationErrorDetails: [],
       urlCheckInterval: null,
       host: "",
       isLetsEncryptEnabled: false,
+      isLetsEncryptCurrentlyEnabled: false,
       isActivesyncEnabled: true,
       isDavEnabled: true,
       isAuxiliaryAccountEnabled: true,
@@ -259,6 +316,7 @@ export default {
       loading: {
         getConfiguration: false,
         configureModule: false,
+        getStatus: false,
       },
       error: {
         getConfiguration: "",
@@ -269,14 +327,23 @@ export default {
         mail_server: "",
         admin_users: "",
         workers_count: "",
+        getStatus: false,
       },
     };
   },
   computed: {
     ...mapState(["instanceName", "core", "appName"]),
+    stillLoading() {
+      return (
+        this.loading.getConfiguration ||
+        this.loading.configureModule ||
+        this.loading.getStatus
+      );
+    },
   },
   created() {
     this.getConfiguration();
+    this.getStatus();
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -289,6 +356,51 @@ export default {
     next();
   },
   methods: {
+    goToCertificates() {
+      this.core.$router.push("/settings/tls-certificates");
+    },
+    async getStatus() {
+      this.loading.getStatus = true;
+      this.error.getStatus = "";
+      const taskAction = "get-status";
+      const eventId = this.getUuid();
+      // register to task error
+      this.core.$root.$once(
+        `${taskAction}-aborted-${eventId}`,
+        this.getStatusAborted
+      );
+      // register to task completion
+      this.core.$root.$once(
+        `${taskAction}-completed-${eventId}`,
+        this.getStatusCompleted
+      );
+      const res = await to(
+        this.createModuleTaskForApp(this.instanceName, {
+          action: taskAction,
+          extra: {
+            title: this.$t("action." + taskAction),
+            isNotificationHidden: true,
+            eventId,
+          },
+        })
+      );
+      const err = res[0];
+      if (err) {
+        console.error(`error creating task ${taskAction}`, err);
+        this.error.getStatus = this.getErrorMessage(err);
+        this.loading.getStatus = false;
+        return;
+      }
+    },
+    getStatusAborted(taskResult, taskContext) {
+      console.error(`${taskContext.action} aborted`, taskResult);
+      this.error.getStatus = this.$t("error.generic_error");
+      this.loading.getStatus = false;
+    },
+    getStatusCompleted(taskContext, taskResult) {
+      this.status = taskResult.output;
+      this.loading.getStatus = false;
+    },
     async getConfiguration() {
       this.loading.getConfiguration = true;
       this.error.getConfiguration = "";
@@ -335,6 +447,7 @@ export default {
       const config = taskResult.output;
       this.host = config.host;
       this.isLetsEncryptEnabled = config.lets_encrypt;
+      this.isLetsEncryptCurrentlyEnabled = config.lets_encrypt;
       this.isActivesyncEnabled = config.activesync;
       this.isDavEnabled = config.dav;
       this.admin_users = config.admin_users.split(",").join("\n");
@@ -410,15 +523,20 @@ export default {
     configureModuleValidationFailed(validationErrors) {
       this.loading.configureModule = false;
       let focusAlreadySet = false;
-
       for (const validationError of validationErrors) {
         const param = validationError.parameter;
-        // set i18n error message
-        this.error[param] = this.$t("settings." + validationError.error);
-
-        if (!focusAlreadySet) {
-          this.focusElement(param);
-          focusAlreadySet = true;
+        if (validationError.details) {
+          // show inline error notification with details
+          this.validationErrorDetails = validationError.details
+            .split("\n")
+            .filter((detail) => detail.trim() !== "");
+        } else {
+          // set i18n error message
+          this.error[param] = this.$t("settings." + validationError.error);
+          if (!focusAlreadySet) {
+            this.focusElement(param);
+            focusAlreadySet = true;
+          }
         }
       }
     },
