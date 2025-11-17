@@ -185,7 +185,7 @@ The sogo-app service file needs to be edited to add the files as volumes:
 
     runagent -m sogo1 systemctl --user edit sogo-app
 
-Following content needs to be written between the commented blocks to work. It's basically the `ExecStart` line from `/home/sogo1/.config/systemd/user/sogo-app.service` with 2 volumes added for the `custom_theme.js` and the `sogo-full.svg`.
+Following content needs to be written between the commented blocks to work. It's basically the `ExecStart` line from `/home/sogo1/.config/systemd/user/sogo-app.service` with 2 volumes added for the `custom_theme.js` and the `logo-full.svg`.
 This way the original `ExecStart` directive is overridden.
 
 ```
@@ -203,7 +203,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/sogo-app.pid \
      --volume ./config/SOGo.conf:/etc/httpd/conf/extra/SOGo.conf:Z \
      --volume ./backups:/etc/sogo/backups:Z \
      --volume %S/state/custom_theme.js:/usr/lib/GNUstep/SOGo/WebServerResources/js/custom_theme.js:Z \
-     --volume %S/state/sogo-full.svg:/usr/lib/GNUstep/SOGo/WebServerResources/img/sogo-full.svg:Z \
+     --volume %S/state/logo-full.svg:/usr/lib/GNUstep/SOGo/WebServerResources/img/logo-full.svg:Z \
      ${SOGO_SERVER_IMAGE}
 
 ### Lines below this comment will be discarded
