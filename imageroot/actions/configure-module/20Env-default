@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2023 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import agent
+import os
+from pathlib import Path
+
+# try to find the timezone except to UTC
+symlink_path = "/etc/localtime"
+resolved_path = Path(symlink_path).resolve()
+timezone = str(resolved_path.relative_to(Path("/usr/share/zoneinfo")))
+
+if not timezone:
+    timezone = "UTC"
+
+def set_env_if_missing(key, value):
+    if key not in os.environ:
+        agent.set_env(key, value)
+
+# Create default vars
+set_env_if_missing("ACTIVESYNC", True)
+set_env_if_missing("DAV", True)
+set_env_if_missing("DRAFTSFOLDER", "Drafts")
+set_env_if_missing("SOGOFOLDERSSENDEMAILNOTIFICATIONS", "NO")
+set_env_if_missing("SOGOACLSSENDEMAILNOTIFICATIONS", "NO")
+set_env_if_missing("SOGOAPPOINTMENTSENDEMAILNOTIFICATIONS", "YES")
+set_env_if_missing("SOGOENABLEEMAILALARMS", "YES")
+set_env_if_missing("SOGOINTERNALSYNCINTERVAL", "30")
+set_env_if_missing("SOGOMAXIMUMPINGINTERVAL", "3540")
+set_env_if_missing("SOGOMAXIMUMSYNCINTERVAL", "3540")
+set_env_if_missing("SOGOMAXIMUMSYNCRESPONSESIZE", "2048")
+set_env_if_missing("SOGOMAXIMUMSYNCWINDOWSIZE", "100")
+set_env_if_missing("SENTFOLDER", "Sent")
+set_env_if_missing("SESSIONDURATION", "1440")
+set_env_if_missing("SXVMEMLIMIT", "512")
+set_env_if_missing("TIMEZONE", timezone)
+set_env_if_missing("TRASHFOLDER", "Trash")
+set_env_if_missing("WOWATCHDOGREQUESTTIMEOUT", "60")
+set_env_if_missing("BACKUPTIME", "#30 0")

@@ -52,7 +52,6 @@
         "mail_server",
         "admin_users",
         "mail_domain",
-        "lets_encrypt",
         "host",
         "workers_count",
         "auxiliary_account",
