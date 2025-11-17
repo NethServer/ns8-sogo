@@ -15,7 +15,7 @@ images=()
 repobase="${REPOBASE:-ghcr.io/nethserver}"
 # Configure the image name
 reponame="sogo"
-sogo_version="5.12.3"
+sogo_version="5.12.4"
 
 # Create a new empty container image
 container=$(buildah from scratch)
