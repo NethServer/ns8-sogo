@@ -61,8 +61,8 @@ The above command will:
 Some settings are not available in the UI, you need to change them manually, refer to documentation : https://www.sogo.nu/files/docs/SOGoInstallationGuide.html
 
 ```
-ssh sogo1@::1
-vim .config/state/environment
+runagent -m sogo1
+vim environment
 ```
 modify the settings, then restart sogo : `systemctl restart --user sogo`
 
