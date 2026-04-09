@@ -2,5 +2,19 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>NethServer/.github:ns8-automerge"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["^build-images\\.sh$"],
+      "matchStrings": [
+        "# To update: visit https://github\\.com/Alinto/sogo/tags\\nsogo_version=\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "Alinto/sogo",
+      "packageNameTemplate": "Alinto/sogo",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^SOGo-(?<version>.+)$",
+      "versioningTemplate": "semver",
+      "autoReplaceStringTemplate": "# To update: visit https://github.com/Alinto/sogo/tags\nsogo_version=\"{{{newValue}}}\""
+    }
   ]
 }
