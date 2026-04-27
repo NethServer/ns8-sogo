@@ -16,7 +16,7 @@ repobase="${REPOBASE:-ghcr.io/nethserver}"
 # Configure the image name
 reponame="sogo"
 # To update: visit https://github.com/Alinto/sogo/tags
-sogo_version="5.12.7"
+sogo_version="fixReverseProxy"
 
 # Create a new empty container image
 container=$(buildah from scratch)
@@ -43,7 +43,7 @@ buildah config --entrypoint=/ \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
     --label="org.nethserver.min-core=3.12.4-0" \
-    --label="org.nethserver.images=docker.io/mariadb:10.11.16 ghcr.io/nethserver/sogo-server:fixReverseProxy" \
+    --label="org.nethserver.images=docker.io/mariadb:10.11.16 ghcr.io/nethserver/sogo-server:${sogo_version}" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
