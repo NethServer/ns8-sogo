@@ -16,7 +16,7 @@ repobase="${REPOBASE:-ghcr.io/nethserver}"
 # Configure the image name
 reponame="sogo"
 # To update: visit https://github.com/Alinto/sogo/tags
-sogo_version="5.12.7-2"
+sogo_version="sdl-archlinuxSansAur"
 
 # Create a new empty container image
 container=$(buildah from scratch)
