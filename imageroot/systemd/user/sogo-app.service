@@ -10,10 +10,10 @@ After=sogo.service mariadb-app.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
-EnvironmentFile=%S/state/environment
-EnvironmentFile=-%S/state/discovery_mail.env
-EnvironmentFile=-%S/state/discovery_ldap.env
-WorkingDirectory=%S/state
+EnvironmentFile=%E/state/environment
+EnvironmentFile=-%E/state/discovery_mail.env
+EnvironmentFile=-%E/state/discovery_ldap.env
+WorkingDirectory=%E/state
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/usr/bin/bash -c "/bin/mkdir -p {config,backups,templates}"
