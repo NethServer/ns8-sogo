@@ -7,7 +7,8 @@
   "status": {
     "title": "Status",
     "app_instance": "App instance",
-    "services": "Service | Services",
+    "failed_services": "Failed services",
+    "all_services_running": "All services are running",
     "app_images": "App image | App images",
     "app_volumes": "App volume | App volumes",
     "installation_node": "Installation node",
