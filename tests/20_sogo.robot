@@ -4,6 +4,7 @@ Resource    api.resource
 
 *** Variables ***
 ${curl_timeout}    9
+${SCENARIO}    install
 
 *** Keywords ***
 Retry test
@@ -15,12 +16,24 @@ Backend URL is reachable
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
 
+Add module
+    [Arguments]    ${image}
+    ${output}  ${rc} =    Execute Command    add-module ${image} 1
+    ...    return_rc=True
+    Should Be Equal As Integers    ${rc}  0
+    RETURN    ${output}
+
 
 *** Test Cases ***
 Check if sogo is installed correctly
-    ${output}  ${rc} =    Execute Command    add-module ${IMAGE_URL} 1
-    ...    return_rc=True
-    Should Be Equal As Integers    ${rc}  0
+    # By name, NS8 installs the stable release; 22_update moves it to the image under test.
+    # sogo is published in NethForge, which a new node has disabled.
+    IF    '${SCENARIO}' == 'update'
+        Run task    cluster/alter-repository    {"name":"nethforge","status":true}
+        ${output} =    Wait Until Keyword Succeeds    5 times    10 seconds    Add module    sogo
+    ELSE
+        ${output} =    Add module    ${IMAGE_URL}
+    END
     &{output} =    Evaluate    ${output}
     Set Global Variable    ${sogo_module_id}    ${output.module_id}
 
