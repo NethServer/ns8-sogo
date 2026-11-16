@@ -39,6 +39,27 @@ Event should exist
     Should Be Equal As Integers    ${rc}    0    ${err}
     Should Contain    ${out}    SUMMARY:${summary}
 
+Contacts URL
+    ${url} =    Sogo backend URL
+    RETURN    ${url}/SOGo/dav/${dav_user}/Contacts/personal
+
+Save contact
+    [Arguments]    ${uid}    ${name}
+    ${contacts} =    Contacts URL
+    ${out}    ${err}    ${rc} =    Execute Command
+    ...    printf 'BEGIN:VCARD\\r\\nVERSION:3.0\\r\\nUID:${uid}\\r\\nFN:${name}\\r\\nN:${name};;;;\\r\\nEND:VCARD\\r\\n' | curl -sS -f -u ${dav_user}:'${dav_password}' -X PUT -H 'Content-Type: text/vcard; charset=utf-8' --data-binary @- ${contacts}/${uid}.vcf
+    ...    return_rc=True    return_stderr=True
+    Should Be Equal As Integers    ${rc}    0    ${err}
+
+Contact should exist
+    [Arguments]    ${uid}    ${name}
+    ${contacts} =    Contacts URL
+    ${out}    ${err}    ${rc} =    Execute Command
+    ...    curl -sS -f -u ${dav_user}:'${dav_password}' ${contacts}/${uid}.vcf
+    ...    return_rc=True    return_stderr=True
+    Should Be Equal As Integers    ${rc}    0    ${err}
+    Should Contain    ${out}    FN:${name}
+
 Module environment
     [Arguments]    ${name}
     ${out} =    Execute Command    runagent -m ${sogo_module_id} printenv ${name}

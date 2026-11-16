@@ -10,11 +10,13 @@ Suite Setup    Skip If    '${SCENARIO}' != 'update'    scenario is ${SCENARIO}, 
 ${SCENARIO}    install
 
 *** Test Cases ***
-Save an event with the stable release
+Save an event and a contact with the stable release
     ${stamp} =    Evaluate    time.time_ns()    modules=time
     Set Suite Variable    ${uid}    pre-update-${stamp}
     Save event    ${uid}    Saved before the update
     Event should exist    ${uid}    Saved before the update
+    Save contact    ${uid}    Contact before the update
+    Contact should exist    ${uid}    Contact before the update
 
 Update to the image under test
     ${rc} =    Execute Command
@@ -27,8 +29,9 @@ Update to the image under test
 Sogo runs after the update
     Wait Until Keyword Succeeds    120 seconds    5 seconds    Sogo answers
 
-The event is still there after the update
+The event and the contact are still there after the update
     Event should exist    ${uid}    Saved before the update
+    Contact should exist    ${uid}    Contact before the update
 
 A new event is saved after the update
     Save event    ${uid}-after    Saved after the update

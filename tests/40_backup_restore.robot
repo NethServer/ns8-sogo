@@ -9,11 +9,13 @@ The restore has run
     Should Be True    ${restored}    the restore did not complete
 
 *** Test Cases ***
-Save an event before the backup
+Save an event and a contact before the backup
     ${stamp} =    Evaluate    time.time_ns()    modules=time
     Set Suite Variable    ${uid}    pre-backup-${stamp}
     Save event    ${uid}    Saved before the backup
     Event should exist    ${uid}    Saved before the backup
+    Save contact    ${uid}    Contact before the backup
+    Contact should exist    ${uid}    Contact before the backup
     ${uuid} =    Module environment    MODULE_UUID
     ${node} =    Module environment    NODE_ID
     ${host} =    Module environment    TRAEFIK_HOST
@@ -77,9 +79,10 @@ The configuration is restored as it was
     ${mail} =    Module environment    MAIL_SERVER
     Should Be Equal    ${mail}    ${mail_server}
 
-The event is restored
+The event and the contact are restored
     [Setup]    The restore has run
     Event should exist    ${uid}    Saved before the backup
+    Contact should exist    ${uid}    Contact before the backup
 
 A new event is saved after the restore
     [Setup]    The restore has run
