@@ -13,17 +13,18 @@ url=${1:?missing url}
 user=${2:?missing user}
 password=${3:?missing password}
 
-jar=$(mktemp)
-trap 'rm -f "${jar}"' EXIT
+headers=$(mktemp)
+trap 'rm -f "${headers}"' EXIT
 
-curl -sS -f -o /dev/null -c "${jar}" \
+curl -sS -f -o /dev/null -D "${headers}" \
     -H 'Content-Type: application/json' \
     -d "{\"userName\":\"${user}\",\"password\":\"${password}\"}" \
     "${url}/SOGo/connect"
 
-# Sent by hand: curl would hold back a cookie flagged Secure on plain http.
-cookies=$(awk -F'\t' 'NF==7 {printf "%s=%s; ", $6, $7}' "${jar}")
-token=$(awk -F'\t' '$6=="XSRF-TOKEN" {print $7}' "${jar}")
+# Read from the headers: the session cookie is flagged Secure, and an old curl
+# drops it from its cookie jar on plain http.
+cookies=$(tr -d '\r' < "${headers}" | sed -n 's/^[Ss]et-[Cc]ookie: *\([^;]*\).*/\1/p' | paste -sd ';' | sed 's/;/; /g')
+token=$(tr -d '\r' < "${headers}" | sed -n 's/^[Ss]et-[Cc]ookie: *XSRF-TOKEN=\([^;]*\).*/\1/p')
 if [[ -z "${token}" ]]; then
     echo "no XSRF-TOKEN cookie after the login" >&2
     exit 1
